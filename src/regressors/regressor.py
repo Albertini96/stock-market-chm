@@ -1,7 +1,7 @@
-from abc import abstractclassmethod
+from abc import ABC, abstractclassmethod
 
 
-class ContextRegressor():
+class ContextRegressor(ABC):
     """
     Performs the decomposition of time series using hilbert huang decomposition
 
