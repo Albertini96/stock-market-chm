@@ -1,19 +1,11 @@
-import pandas
-from chm import CascadeHierarquicalModel
-from decomposers.hilbert_huang import EMDDecomposition
-from regressors.lstm_regressor import LSTMRegressor
 from data_retriever import DataRetriever
-from pre_processing import PreProcessing
+from pre_processing import PreProcessing as pp
 from scalers.min_max import MinMax
-from scalers.scaler import Scaler
-from scalers.standard import Standard
 
 if __name__ == "__main__":
     
-    dr = DataRetriever()
-    pp = PreProcessing()
-    yahoo_ds = dr.download_yahoo_data()
-    scaled_yahoo_ds = pp.values_scaler_partition_by_2(yahoo_ds, 'Ticker', 'Var', 'value', MinMax)
+    a = DataRetriever()
+    b = a.get_yahoo_stock_data()    
 
-    print(yahoo_ds)
-    print(scaled_yahoo_ds)
+    pp.values_scaler(b, b.columns.difference(['Date']), MinMax, True)
+    pp.fill_stock_data_missings(b, True)
