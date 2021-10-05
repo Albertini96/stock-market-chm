@@ -12,9 +12,9 @@ class DataRetriever:
 
     def get_yahoo_stock_data(self) -> DataFrame:
         #Getting dictionary of stocks and associating with stock market
-        tsmm = config.Config.ticker_stock_market_map
+        tickers = config.Config.get_tickers()
         
-        yahoo_stock_data = self._download_yahoo_data(hp.flatten_list(tsmm.values()))
+        yahoo_stock_data = self._download_yahoo_data(tickers)
         yahoo_stock_data.columns = ['_'.join(col).strip() for col in yahoo_stock_data.columns.values]
 
         return yahoo_stock_data.reset_index()

@@ -2,6 +2,7 @@
 from typing import List, Union
 import numpy as np
 import pandas as pd
+import pandas_ta as ta
 from pandas.core.frame import DataFrame
 from requests.sessions import dispatch_hook
 from scalers.scaler import Scaler
@@ -91,14 +92,14 @@ class PreProcessing():
     @staticmethod
     def fill_stock_data_missings(ds:DataFrame, 
                                 transform_inplace:bool
-                            ) -> None or DataFrame:
+                            ) -> DataFrame:
         """
         Performs missing filling
 
         parameters : DataFrame (dataframe to fill missings)
                      bool      (whether function applies inplace or copy)
         
-        returns : dataframe if transform_inplace is false, none if transform_inplace is true
+        returns : DataFrame
         
         """
 
@@ -112,17 +113,207 @@ class PreProcessing():
 
         return ret
 
-    def _replace_row_cell_with_last(ds):
+    def _replace_row_cell_with_last(ds:DataFrame) -> None:
+        """
+        Replaces an empty cell with last non Null value from dataframe
+
+        parameters : DataFrame (dataframe to fill missings)
         
-        last_row = None
-        row = None
+        returns : None
         
+        """
+
         for index, row in ds.iterrows():
-            if last_row is not None:
-                for col in ds.columns:
-                    if pd.isna(row[col]):
-                        ds.loc[index, col] = last_row[col]
-            last_row = row  
+            index_temp = index
+            for col in ds.columns:
+                if pd.isna(row[col]):
+                    i = 1
+                    while((index_temp-i > 0) & pd.isna(ds.loc[index_temp-i, col])):
+                        i += 1
+
+                    ds.loc[index_temp, col] = ds.loc[index_temp-i, col]
+
+    @staticmethod 
+    def add_bollinger_bands(ds:DataFrame, 
+                            cols:List[str],
+                            inplace:bool = True,
+                            save_pictures:bool = False
+                            ) -> DataFrame:
+        """
+        Adds bollinger bands value to dataframe
+
+        parameters : DataFrame (dataframe to add values)
+                     List[str] (list of name of cols to apply bollinger bands)
+                     bool      (weather the original dataframe will be replaced or copied)
+                     bool      (saves figures of results)
+
+        returns : DataFrame with bollinger bands analysis
         
+        """
+
+        ds_copy = None
+
+        if inplace:
+            ds_copy = ds
+        else:
+            ds_copy = ds.copy()
+             
+        for i in cols:
+
+            bands = ta.bbands(ds[i])
+            bands = bands[['BBL_5_2.0', 'BBM_5_2.0', 'BBU_5_2.0']]
+            bands.columns = [i + '_' + col for col in bands.columns]
+
+            ds_copy[bands.columns] = bands
+            
+            if save_pictures:
+                print('Saving bbands picture of : ', i)
+
+                bands['close'] = ds[i]
+                plot = bands.plot(figsize=(100, 40), grid=True, legend=True)
+
+                fig = plot.get_figure()
+                fig.savefig("../figs/bollinger_bands/output" + i + ".png")
         
+        return ds_copy
+
+    @staticmethod 
+    def add_sma(ds:DataFrame, 
+                            cols:List[str],
+                            inplace:bool = True,
+                            sma_length:int = 5,
+                            save_pictures:bool = False
+                            ):
+        """
+        Adds SMA values to dataframe
+
+        parameters : DataFrame (dataframe to add values)
+                     List[str] (list of name of cols to apply SMA)
+                     bool      (weather the original dataframe will be replaced or copied)
+                     int       (length of SMA)
+                     bool      (saves figures of results)
+
+        returns : DataFrame with SMA analysis
         
+        """
+
+        ds_copy = None
+
+        if inplace:
+            ds_copy = ds
+        else:
+            ds_copy = ds.copy()
+             
+        for i in cols:
+            
+            sma = ta.sma(ds[i], sma_length)
+            
+            ds_copy[i + '_SMA_' + str(sma_length)] = sma
+            
+            if save_pictures:
+                print('Saving SMA picture of : ' + i + '_SMA_' + str(sma_length))
+
+                sma_plot = pd.DataFrame()
+                sma_plot['close'] = ds[i]
+                sma_plot[i + '_SMA_' + str(sma_length)] = sma
+
+                plot = sma_plot.plot(figsize=(100, 40), grid=True, legend=True)
+
+                fig = plot.get_figure()
+                fig.savefig("../figs/sma/output" + i + ".png")
+        
+        return ds_copy
+
+    @staticmethod 
+    def add_rsi(ds:DataFrame, 
+                            cols:List[str],
+                            inplace:bool = True,
+                            rsi_length:int = None,
+                            save_pictures:bool = False
+                            ):
+        """
+        Adds RSI (Relative Strength Index) values to dataframe
+
+        parameters : DataFrame (dataframe to add values)
+                     List[str] (list of name of cols to apply RSI)
+                     bool      (weather the original dataframe will be replaced or copied)
+                     bool      (saves figures of results)
+
+        returns : DataFrame with RSI values
+        
+        """
+
+        ds_copy = None
+
+        if inplace:
+            ds_copy = ds
+        else:
+            ds_copy = ds.copy()
+             
+        for i in cols:
+            
+            rsi = ta.rsi(ds[i], lenght=rsi_length)
+            
+            ds_copy[i + '_RSI'] = rsi
+            
+            if save_pictures:
+                print('Saving RSI picture of : ' + i + '_RSI')
+
+                rsi_plot = pd.DataFrame()
+                rsi_plot['close'] = ds[i]
+                rsi_plot[i + '_RSI'] = rsi
+
+                plot = rsi_plot.plot(figsize=(100, 40), grid=True, legend=True)
+
+                fig = plot.get_figure()
+                fig.savefig("../figs/rsi/output" + i + ".png")
+        
+        return ds_copy
+
+    @staticmethod 
+    def add_stochastic_oscilator(ds:DataFrame, 
+                                cols:List[str],
+                                high_posfix:str ='_High',
+                                low_posfix:str ='_Low',
+                                close_posfix:str ='_Close',
+                                inplace:bool = True,
+                                save_pictures:bool = False
+                                ):
+        """
+        Adds stochastic oscillators values to dataframe, the function expects a list of str, each str must have a high, low, close pair str. (e.g stock -> stock_High, stock_Low, stock_Close)
+
+        parameters : DataFrame (dataframe add values)
+                     List[str] (list of name of cols to apply bollinger bands)
+                     str       (high posfix of columns)
+                     str       (low posfix of columns)
+                     str       (close posfix of columns)
+                     bool      (weather the original dataframe will be replaced or copied)
+                     bool      (saves figures of results)
+
+        returns : DataFrame with stochastic oscillators values
+        
+        """
+
+        ds_copy = None
+
+        if inplace:
+            ds_copy = ds
+        else:
+            ds_copy = ds.copy()
+             
+        for i in cols:
+
+            stoch = ta.stoch(ds[i+high_posfix], ds[i+low_posfix], ds[i+close_posfix])
+            stoch = stoch[['STOCHk_14_3_3', 'STOCHd_14_3_3']]
+            stoch.columns = [i + '_' + col for col in stoch.columns]
+
+            ds_copy[stoch.columns] = stoch
+            
+            if save_pictures:
+                print('Saving stochastic oscillator picture of : ', i)
+
+                stoch['close'] = ds[i+close_posfix]
+                plot = stoch.plot(figsize=(100, 40), grid=True, legend=True)
+
+                fig = plot.get_figure()
+                fig.savefig("../figs/stochastic_oscillator/output" + i + ".png")

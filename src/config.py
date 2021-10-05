@@ -1,3 +1,4 @@
+from helpers import Helper as hp
 class Config():
     def __init__(self) -> None:
         pass    
@@ -27,3 +28,8 @@ class Config():
                 # # Frankfurt Stock Exchange
                 # 'FSE' : ['ITUB4', ],
     }
+
+    def get_tickers():
+        tsmm = Config.ticker_stock_market_map
+        return hp.flatten_list(tsmm.values())
+        
