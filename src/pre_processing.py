@@ -1,11 +1,11 @@
 
-from typing import List, Union
+from typing import Dict, List, Union
 import numpy as np
 import pandas as pd
 import pandas_ta as ta
 from pandas.core.frame import DataFrame
 from requests.sessions import dispatch_hook
-from scalers.scaler import Scaler
+from scalers.scaler import BaseScaler
 
 class PreProcessing():
     def __init__(self) -> None:
@@ -18,7 +18,7 @@ class PreProcessing():
                                         first_col:str, 
                                         second_col:str,
                                         column_to_scale:str,
-                                        used_scaler: Scaler
+                                        used_scaler: BaseScaler
                                     ) -> DataFrame:
         """
         Performs scaling of variables in a dataframe for each partition of by list
@@ -61,9 +61,9 @@ class PreProcessing():
     def values_scaler(
                         ds:DataFrame, 
                         columns_to_scale:List[str],
-                        used_scaler:Scaler,
+                        used_scaler:BaseScaler,
                         transform_inplace:bool
-                    ) -> dict[str, Scaler]:
+                    ) -> Dict[str, BaseScaler]:
         """
         Performs scaling of list of columns from dataframe
 
@@ -76,7 +76,7 @@ class PreProcessing():
         
         """
         # Setting return variable to None
-        scalers:dict[str, Scaler] = dict[str, Scaler]()
+        scalers:dict[str, BaseScaler] = dict[str, BaseScaler]()
 
         #Fitting all scalers
         for col in columns_to_scale:
@@ -183,7 +183,7 @@ class PreProcessing():
                             inplace:bool = True,
                             sma_length:int = 5,
                             save_pictures:bool = False
-                            ):
+                            ) -> DataFrame:
         """
         Adds SMA values to dataframe
 
@@ -230,7 +230,7 @@ class PreProcessing():
                             inplace:bool = True,
                             rsi_length:int = None,
                             save_pictures:bool = False
-                            ):
+                            ) -> DataFrame:
         """
         Adds RSI (Relative Strength Index) values to dataframe
 
@@ -278,7 +278,7 @@ class PreProcessing():
                                 close_posfix:str ='_Close',
                                 inplace:bool = True,
                                 save_pictures:bool = False
-                                ):
+                                ) -> DataFrame:
         """
         Adds stochastic oscillators values to dataframe, the function expects a list of str, each str must have a high, low, close pair str. (e.g stock -> stock_High, stock_Low, stock_Close)
 

@@ -1,8 +1,8 @@
 from typing import Any
-from scalers.scaler import Scaler
+from scalers.scaler import BaseScaler
 from sklearn.preprocessing import StandardScaler
 
-class Standard(StandardScaler):
+class Standard(BaseScaler):
     """
     Performs scaling of data using standard scaler
 

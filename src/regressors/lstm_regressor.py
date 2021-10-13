@@ -1,6 +1,6 @@
-from regressors.regressor import ContextRegressor
+from regressors.regressor import BaseRegressor
 
-class LSTMRegressor(ContextRegressor):
+class LSTMRegressor(BaseRegressor):
     """
     Performs the regression of time series using LSTMs
 

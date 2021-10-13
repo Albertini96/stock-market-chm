@@ -1,6 +1,6 @@
-from decomposers.decomposer import SeriesDecomposer
+from decomposers.decomposer import BaseDecomposer
 
-class EMDDecomposition(SeriesDecomposer):
+class EMDDecomposition(BaseDecomposer):
     """
     Performs the decomposition of time series using hilbert huang decomposition
 

@@ -1,7 +1,7 @@
 from abc import ABC, abstractclassmethod
 
 
-class ContextRegressor(ABC):
+class BaseRegressor(ABC):
     """
     Performs the decomposition of time series using hilbert huang decomposition
 
@@ -14,6 +14,9 @@ class ContextRegressor(ABC):
         pass
 
     @abstractclassmethod
-    def extract_context(self) -> object:
+    def fit(self, X, y) -> object:
         pass
 
+    @abstractclassmethod
+    def predict(self, X) -> object:
+        pass

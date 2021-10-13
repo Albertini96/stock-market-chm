@@ -2,7 +2,7 @@ from abc import ABC, abstractclassmethod
 from typing import Any, Union
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
-class Scaler(ABC):
+class BaseScaler(ABC):
     """
     Performs the scaling of data
 

@@ -1,8 +1,8 @@
 from typing import Any
-from scalers.scaler import Scaler
+from scalers.scaler import BaseScaler
 from sklearn.preprocessing import MinMaxScaler
 
-class MinMax(Scaler):
+class MinMax(BaseScaler):
     """
     Performs scaling of data using min max scaler
 

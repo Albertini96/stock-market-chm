@@ -1,6 +1,6 @@
 import abc
 
-class SeriesDecomposer(abc.ABC):
+class BaseDecomposer(abc.ABC):
     """
     Abstract class for the decomposition methods
 
@@ -11,5 +11,5 @@ class SeriesDecomposer(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def decompose_series(self) -> object:
+    def decompose_series(self, X) -> object:
         pass
