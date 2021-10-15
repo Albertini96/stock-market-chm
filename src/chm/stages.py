@@ -6,8 +6,14 @@ from regressors.regressor import BaseRegressor
 class CHMStage():
         
     """
-        
-    
+        Stage object of a CHM structure
+
+        parameters : List[CHMLevel]  (List of CHM Levels contained on this stage)    
+                     BaseRegressor   (Regressor used to join context created for this stage)
+                     DataFrame       (X used on regressor)
+                     DataFrame       (y used on regressor)
+
+        returns : 
     """
 
     def __init__(self, level_list:List[CHMLevel],

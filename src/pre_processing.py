@@ -123,15 +123,29 @@ class PreProcessing():
         
         """
 
+        #for each line of the dataset
         for index, row in ds.iterrows():
+
             index_temp = index
+            ds_len = len(ds)
+            
+            #for each column of the dataset
             for col in ds.columns:
-                if pd.isna(row[col]):
+                #if is first row and is null, find the next value that is not null to replace
+                if(index_temp == 0 and pd.isna(ds.loc[index_temp, col])):
                     i = 1
-                    while((index_temp-i > 0) & pd.isna(ds.loc[index_temp-i, col])):
+                    while((index_temp+i < ds_len) and pd.isna(ds.loc[index_temp+i, col])):
                         i += 1
 
-                    ds.loc[index_temp, col] = ds.loc[index_temp-i, col]
+                    ds.loc[index_temp, col] = ds.loc[index_temp+i, col]
+                else:
+                    #if row is null find the first value that comes before it, that is not null to replace it
+                    if pd.isna(row[col]):
+                        i = 1
+                        while((index_temp-i > 0) and pd.isna(ds.loc[index_temp-i, col])):
+                            i += 1
+
+                        ds.loc[index_temp, col] = ds.loc[index_temp-i, col]
 
     @staticmethod 
     def add_bollinger_bands(ds:DataFrame, 

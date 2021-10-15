@@ -1,5 +1,6 @@
 from abc import ABC, abstractclassmethod
-
+from typing import Any
+from pandas.core.frame import DataFrame
 
 class BaseRegressor(ABC):
     """
@@ -14,9 +15,17 @@ class BaseRegressor(ABC):
         pass
 
     @abstractclassmethod
-    def fit(self, X, y) -> object:
+    def fit(self, X, y) -> None:
         pass
 
     @abstractclassmethod
-    def predict(self, X) -> object:
+    def fit_generator(self, X) -> None:
+        pass
+
+    @abstractclassmethod
+    def predict(self, X) -> Any:
+        pass
+
+    @abstractclassmethod
+    def predict_generator(self, X) -> Any:
         pass

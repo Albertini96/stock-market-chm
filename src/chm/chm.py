@@ -7,13 +7,14 @@ from copy import copy
 
 class CascadeHierarquicalModel():
     """
-    Performs the extraction of time series context
+    Cascade Hierarquical Model used to extract context from timeseries and predict non stationary timeseries
 
-    parameters : ContextRegressor (regressor used to extract context)
+    parameters : BaseRegressor    (Instanciated base regressor used to extract context)
+                 BaseRegressor    (Instanciated base regressor used to join context created from the stages)
                  SeriesDecomposer (decomposition used to extract frequency from time series)
-                 int    (number of levels in the hierarquical model)
-                 int    (number of stages in the hierarquical model)
-                 bool   (use frequency extracted from time series as a feature)
+                 int              (number of levels in the hierarquical model)
+                 int              (number of stages in the hierarquical model)
+                 bool             (use frequency extracted from time series as a feature)
     
     """
     
