@@ -5,14 +5,18 @@ import pandas as pd
 import pandas_ta as ta
 from pandas.core.frame import DataFrame
 from requests.sessions import dispatch_hook
+from config import Config
 from scalers.scaler import BaseScaler
+from sklearn.model_selection import train_test_split
 
 class PreProcessing():
-    def __init__(self) -> None:
-        pass
+    def __init__(self, ds, base_scaler:BaseScaler) -> None:
+        self._scalers:Dict[str, BaseScaler] = None
+        self._base_scaler                   = base_scaler
+        self.ds:DataFrame                   = ds
     # List of columns  dataframe separator (number of scalers = number of unique from all items)
 
-    @staticmethod
+   
     def values_scaler_partition_by_2(self,
                                         ds:DataFrame, 
                                         first_col:str, 
@@ -57,8 +61,8 @@ class PreProcessing():
 
         return ds_scaled
 
-    @staticmethod
-    def values_scaler(
+   
+    def values_scaler( self,
                         ds:DataFrame, 
                         columns_to_scale:List[str],
                         used_scaler:BaseScaler,
@@ -89,8 +93,9 @@ class PreProcessing():
 
         return scalers
 
-    @staticmethod
-    def fill_stock_data_missings(ds:DataFrame, 
+   
+    def fill_stock_data_missings(self,
+                                ds:DataFrame, 
                                 transform_inplace:bool
                             ) -> DataFrame:
         """
@@ -106,14 +111,15 @@ class PreProcessing():
         ret = None
 
         if transform_inplace:
-            PreProcessing._replace_row_cell_with_last(ds)
+            self._replace_row_cell_with_last(ds)
         else:
             ret = ds.copy()
-            PreProcessing._replace_row_cell_with_last(ret)
+            self._replace_row_cell_with_last(ret)
 
         return ret
 
-    def _replace_row_cell_with_last(ds:DataFrame) -> None:
+    def _replace_row_cell_with_last(self,
+                                    ds:DataFrame) -> None:
         """
         Replaces an empty cell with last non Null value from dataframe
 
@@ -147,8 +153,9 @@ class PreProcessing():
 
                         ds.loc[index_temp, col] = ds.loc[index_temp-i, col]
 
-    @staticmethod 
-    def add_bollinger_bands(ds:DataFrame, 
+    
+    def add_bollinger_bands(self,
+                            ds:DataFrame, 
                             cols:List[str],
                             inplace:bool = True,
                             save_pictures:bool = False
@@ -191,13 +198,14 @@ class PreProcessing():
         
         return ds_copy
 
-    @staticmethod 
-    def add_sma(ds:DataFrame, 
-                            cols:List[str],
-                            inplace:bool = True,
-                            sma_length:int = 5,
-                            save_pictures:bool = False
-                            ) -> DataFrame:
+   
+    def add_sma(self,
+                ds:DataFrame, 
+                cols:List[str],
+                inplace:bool = True,
+                sma_length:int = 5,
+                save_pictures:bool = False
+                ) -> DataFrame:
         """
         Adds SMA values to dataframe
 
@@ -238,13 +246,13 @@ class PreProcessing():
         
         return ds_copy
 
-    @staticmethod 
-    def add_rsi(ds:DataFrame, 
-                            cols:List[str],
-                            inplace:bool = True,
-                            rsi_length:int = None,
-                            save_pictures:bool = False
-                            ) -> DataFrame:
+    def add_rsi(self,
+                ds:DataFrame, 
+                cols:List[str],
+                inplace:bool = True,
+                rsi_length:int = None,
+                save_pictures:bool = False
+                ) -> DataFrame:
         """
         Adds RSI (Relative Strength Index) values to dataframe
 
@@ -284,8 +292,8 @@ class PreProcessing():
         
         return ds_copy
 
-    @staticmethod 
-    def add_stochastic_oscilator(ds:DataFrame, 
+    def add_stochastic_oscilator(self,
+                                ds:DataFrame, 
                                 cols:List[str],
                                 high_posfix:str ='_High',
                                 low_posfix:str ='_Low',
@@ -331,3 +339,39 @@ class PreProcessing():
 
                 fig = plot.get_figure()
                 fig.savefig("../figs/stochastic_oscillator/output" + i + ".png")
+
+    def pre_process(self):
+        #For training dataset
+        train, test = train_test_split(self.ds, test_size=0.33, shuffle=False)
+        test = test.reset_index(drop=True)
+
+        #Adding features
+        clse_cols = [x for x in train.columns.difference(['Date']) if x[-5:] == 'Close']
+        self.add_bollinger_bands(train, clse_cols, True, False)
+        self.add_sma(train, clse_cols, True, 5, False)
+        self.add_rsi(train, clse_cols, True, save_pictures=False)
+        self.add_stochastic_oscilator(train, Config.get_tickers(), inplace=True, save_pictures=False)
+
+        #Scaling values
+        self._scalers = self.values_scaler(train, train.columns.difference(['Date']), self._base_scaler, True)
+
+        #Filling missings
+        self.fill_stock_data_missings(train, True)
+
+
+        #For testing dataset
+        #Adding features
+        clse_cols = [x for x in test.columns.difference(['Date']) if x[-5:] == 'Close']
+        self.add_bollinger_bands(test, clse_cols, True, False)
+        self.add_sma(test, clse_cols, True, 5, False)
+        self.add_rsi(test, clse_cols, True, save_pictures=False)
+        self.add_stochastic_oscilator(test, Config.get_tickers(), inplace=True, save_pictures=False)
+
+        #Scaling values
+        for col in self._scalers.keys():
+            test[[col]] = self._scalers[col].transform(test[[col]])
+
+        #Filling missings
+        self.fill_stock_data_missings(test, True)
+
+        return train, test

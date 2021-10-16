@@ -1,4 +1,6 @@
 from typing import Any
+
+from keras.preprocessing.sequence import TimeseriesGenerator
 from regressors.regressor import BaseRegressor
 from pandas.core.frame import DataFrame
 from keras.models import Sequential
@@ -11,9 +13,15 @@ class LSTMRegressor(BaseRegressor):
     parameters : 
                  
     """
-    def __init__(self, n_inputs, n_features, epochs) -> None:
+    def __init__(self, ds, x_cols, y_cols, n_inputs, n_features, epochs) -> None:
         self._train_history = None
+        self.n_inputs       = n_inputs
+        self.n_features     = n_features
         self._epochs        = epochs
+        self.ds             = ds
+        self.x_cols         = x_cols
+        self.y_cols         = y_cols
+
 
         self._regressor = Sequential()
         self._regressor.add(Dense(50))
@@ -32,9 +40,11 @@ class LSTMRegressor(BaseRegressor):
                                                 y,
                                                 epochs = 8
                                             )
-    def fit_generator(self, gen) -> None:
+    def fit_generator(self) -> None:
+        train_ts_gen = TimeseriesGenerator(self.ds[self.x_cols].to_numpy(), self.ds[self.y_cols].to_numpy(), self.n_inputs)
+
         self._train_history = self._regressor.fit(
-                                                gen,
+                                                train_ts_gen,
                                                 epochs = self._epochs
                                             )
 
@@ -42,4 +52,5 @@ class LSTMRegressor(BaseRegressor):
         return  self._regressor.predict(X)
 
     def predict_generator(self, X) -> Any:
-        return  self._regressor.predict(X)
+        test_ts_gen  = TimeseriesGenerator(X[self.x_cols].to_numpy(), X[self.y_cols].to_numpy(), self.n_inputs)
+        return  self._regressor.predict(test_ts_gen)

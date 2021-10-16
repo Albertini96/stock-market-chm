@@ -1,3 +1,4 @@
+from numpy.lib.function_base import copy
 import pandas as pd
 from pandas.core.frame import DataFrame
 import config
@@ -8,16 +9,20 @@ yf.pdr_override() # <== that's all it takes :-)
 
 class DataRetriever:
     def __init__(self) -> None:
+        self.stock_ds = None
         pass
 
-    def get_yahoo_stock_data(self) -> DataFrame:
+    def get_stock_ds(self) -> DataFrame:
+        return self.stock_ds.copy()
+
+    def get_yahoo_stock_data(self) -> None:
         #Getting dictionary of stocks and associating with stock market
         tickers = config.Config.get_tickers()
         
         yahoo_stock_data = self._download_yahoo_data(tickers)
         yahoo_stock_data.columns = ['_'.join(col).strip() for col in yahoo_stock_data.columns.values]
 
-        return yahoo_stock_data.reset_index()
+        self.stock_ds = yahoo_stock_data.reset_index()
 
     def _download_yahoo_data(self, in_tickers) -> DataFrame:
         data = pdr.get_data_yahoo( 
