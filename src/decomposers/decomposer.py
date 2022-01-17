@@ -1,5 +1,6 @@
 import abc
-
+import array
+from pandas.core.frame import DataFrame
 class BaseDecomposer(abc.ABC):
     """
     Abstract class for the decomposition methods
@@ -11,5 +12,8 @@ class BaseDecomposer(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def decompose_series(self, X) -> object:
+    def decompose_series(self, 
+                        ds:DataFrame, 
+                        apply_cols:array[str]
+                        ) -> object:
         pass

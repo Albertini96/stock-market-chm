@@ -4,13 +4,16 @@ import numpy as np
 import pandas as pd
 import pandas_ta as ta
 from pandas.core.frame import DataFrame
-from requests.sessions import dispatch_hook
 from config import Config
 from scalers.scaler import BaseScaler
 from sklearn.model_selection import train_test_split
-
+import seaborn as sns
+from matplotlib import pyplot as plt
+import os 
 class PreProcessing():
-    def __init__(self, ds, base_scaler:BaseScaler) -> None:
+    def __init__(self, 
+                    ds, 
+                    base_scaler:BaseScaler) -> None:
         self._scalers:Dict[str, BaseScaler] = None
         self._base_scaler                   = base_scaler
         self.ds:DataFrame                   = ds
@@ -60,7 +63,6 @@ class PreProcessing():
             row['scaler'] = scaler_temp
 
         return ds_scaled
-
    
     def values_scaler( self,
                         ds:DataFrame, 
@@ -93,7 +95,6 @@ class PreProcessing():
 
         return scalers
 
-   
     def fill_stock_data_missings(self,
                                 ds:DataFrame, 
                                 transform_inplace:bool
@@ -153,7 +154,6 @@ class PreProcessing():
 
                         ds.loc[index_temp, col] = ds.loc[index_temp-i, col]
 
-    
     def add_bollinger_bands(self,
                             ds:DataFrame, 
                             cols:List[str],
@@ -191,14 +191,26 @@ class PreProcessing():
                 print('Saving bbands picture of : ', i)
 
                 bands['close'] = ds[i]
-                plot = bands.plot(figsize=(100, 40), grid=True, legend=True)
 
-                fig = plot.get_figure()
-                fig.savefig("../figs/bollinger_bands/output" + i + ".png")
+                sns.set_style("whitegrid")
+                plt.figure(figsize=(90,10))
+
+                for j in bands.columns:
+                    plt.plot(bands[j], label=j)
+
+                num_dates = np.arange(1, len(ds), 30)
+                plt.xticks(num_dates, [str(ds['Date'][i]) for i in num_dates], rotation='vertical')
+                plt.legend()
+                
+                folder = '../figs/bollinger_bands/'
+                if not os.path.exists(folder):
+                    os.makedirs(folder)
+
+                plt.savefig('../figs/bollinger_bands/output' + i + ".png")
+
         
         return ds_copy
 
-   
     def add_sma(self,
                 ds:DataFrame, 
                 cols:List[str],
@@ -229,20 +241,30 @@ class PreProcessing():
         for i in cols:
             
             sma = ta.sma(ds[i], sma_length)
-            
             ds_copy[i + '_SMA_' + str(sma_length)] = sma
             
             if save_pictures:
                 print('Saving SMA picture of : ' + i + '_SMA_' + str(sma_length))
 
+                sns.set_style("whitegrid")
+                plt.figure(figsize=(90,10))
+                
                 sma_plot = pd.DataFrame()
                 sma_plot['close'] = ds[i]
                 sma_plot[i + '_SMA_' + str(sma_length)] = sma
 
-                plot = sma_plot.plot(figsize=(100, 40), grid=True, legend=True)
+                plt.plot(sma_plot['close'], label=i)
+                plt.plot(sma_plot[i + '_SMA_' + str(sma_length)], label=i + '_SMA_' + str(sma_length))
+                
+                num_dates = np.arange(1, len(ds), 30)
+                plt.xticks(num_dates, [str(ds['Date'][i]) for i in num_dates], rotation='vertical')
+                plt.legend()
+                
+                folder = '../figs/sma/'
+                if not os.path.exists(folder):
+                    os.makedirs(folder)
 
-                fig = plot.get_figure()
-                fig.savefig("../figs/sma/output" + i + ".png")
+                plt.savefig("../figs/sma/output" + i + ".png")
         
         return ds_copy
 
@@ -281,14 +303,25 @@ class PreProcessing():
             if save_pictures:
                 print('Saving RSI picture of : ' + i + '_RSI')
 
+                sns.set_style("whitegrid")
+                plt.figure(figsize=(90,10))
+                
                 rsi_plot = pd.DataFrame()
                 rsi_plot['close'] = ds[i]
                 rsi_plot[i + '_RSI'] = rsi
 
-                plot = rsi_plot.plot(figsize=(100, 40), grid=True, legend=True)
+                plt.plot(rsi_plot['close'], label=i)
+                plt.plot(rsi_plot[i + '_RSI'], label=i + '_RSI')
+                
+                num_dates = np.arange(1, len(ds), 30)
+                plt.xticks(num_dates, [str(ds['Date'][i]) for i in num_dates], rotation='vertical')
+                plt.legend()
+                
+                folder = '../figs/rsi/'
+                if not os.path.exists(folder):
+                    os.makedirs(folder)
 
-                fig = plot.get_figure()
-                fig.savefig("../figs/rsi/output" + i + ".png")
+                plt.savefig("../figs/rsi/output" + i + ".png")
         
         return ds_copy
 
@@ -334,11 +367,23 @@ class PreProcessing():
             if save_pictures:
                 print('Saving stochastic oscillator picture of : ', i)
 
-                stoch['close'] = ds[i+close_posfix]
-                plot = stoch.plot(figsize=(100, 40), grid=True, legend=True)
+                #stoch['close'] = ds[i+close_posfix]
+                
+                sns.set_style("whitegrid")
+                plt.figure(figsize=(90,10))
 
-                fig = plot.get_figure()
-                fig.savefig("../figs/stochastic_oscillator/output" + i + ".png")
+                for j in stoch.columns:
+                    plt.plot(stoch[j], label=j)
+
+                num_dates = np.arange(1, len(ds), 30)
+                plt.xticks(num_dates, [str(ds['Date'][i]) for i in num_dates], rotation='vertical')
+                plt.legend()
+                
+                folder = '../figs/stochastic_oscillator/'
+                if not os.path.exists(folder):
+                    os.makedirs(folder)
+
+                plt.savefig('../figs/stochastic_oscillator/output' + i + ".png")
 
     def pre_process(self):
         #For training dataset
@@ -357,7 +402,6 @@ class PreProcessing():
 
         #Filling missings
         self.fill_stock_data_missings(train, True)
-
 
         #For testing dataset
         #Adding features

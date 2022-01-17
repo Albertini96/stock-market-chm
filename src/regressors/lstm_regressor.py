@@ -2,9 +2,8 @@ from typing import Any
 
 from keras.preprocessing.sequence import TimeseriesGenerator
 from regressors.regressor import BaseRegressor
-from pandas.core.frame import DataFrame
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, LSTM, SpatialDropout1D
+from keras.layers import Dense, LSTM
 
 class LSTMRegressor(BaseRegressor):
     """
@@ -24,9 +23,7 @@ class LSTMRegressor(BaseRegressor):
 
 
         self._regressor = Sequential()
-        self._regressor.add(Dense(50))
         self._regressor.add(LSTM(100, input_shape=(n_inputs, n_features)))
-        self._regressor.add(Dense(40))
         self._regressor.add(Dense(1))
     
         self._regressor.compile(
@@ -45,7 +42,8 @@ class LSTMRegressor(BaseRegressor):
 
         self._train_history = self._regressor.fit(
                                                 train_ts_gen,
-                                                epochs = self._epochs
+                                                epochs = self._epochs,
+                                                verbose = 0
                                             )
 
     def predict(self, X) -> Any:
