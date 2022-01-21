@@ -32,12 +32,13 @@ class CascadeHierarquicalModel():
         self._use_frequency     = use_frequency
         self._list_stages       = list[CHMStage]
 
-        for stage in self._num_stages:
+        for stage in range(self._num_stages):
             temp_level_list = list[CHMLevel]
-            for level in self._num_levels:
+            for level in range(self._num_levels):
                 temp_level_list.append(CHMLevel(copy(context_regressor)))
             self._list_stages.append(CHMStage(temp_level_list, copy(stage_regressor)))
 
+        
 
     def extract_context(self) -> None:
         pass

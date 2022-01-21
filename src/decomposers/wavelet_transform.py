@@ -1,4 +1,4 @@
-from array import array
+from typing import List
 from xmlrpc.client import Boolean
 from pandas.core.frame import DataFrame
 import pywt
@@ -15,11 +15,11 @@ class WaveletDecomposition(BaseDecomposer):
 
     def __init__(self) -> None:
         self.wavelet     = pywt.Wavelet('db4')
-        self.count_waves = dict()
+        self.dict_waves  = dict()
 
     def decompose_series(self, 
                         ds:DataFrame,
-                        apply_cols:array[str]
+                        apply_cols:List[str]
                         ) -> object:
         
         for col in apply_cols:
@@ -28,7 +28,7 @@ class WaveletDecomposition(BaseDecomposer):
             coeffs = pywt.wavedec(ds[col], self.wavelet)
 
             #Building dictionary of number of waves found
-            self.count_waves[col] = len(coeffs)
+            self.dict_waves[col] = list()
 
             # For each array of coefficients found
             for i in range(len(coeffs)):
@@ -42,5 +42,11 @@ class WaveletDecomposition(BaseDecomposer):
                             coeffs2[j][k] = 0
 
                 #Adding decomposed wave to the dataset
-                ds[col + '_wave_' + str(i)] = pywt.waverec(coeffs2, self.wavelet)
-                        
+                rec = pywt.waverec(coeffs2, self.wavelet)
+                
+                new_col = col + '_wave_' + str(i)
+                self.dict_waves[col].append(new_col)
+                ds[new_col] = rec[:len(rec)-1]
+
+
+    

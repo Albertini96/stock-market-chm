@@ -1,7 +1,8 @@
-import abc
+from abc import ABC, abstractclassmethod
 import array
+from typing import List
 from pandas.core.frame import DataFrame
-class BaseDecomposer(abc.ABC):
+class BaseDecomposer(ABC):
     """
     Abstract class for the decomposition methods
 
@@ -9,11 +10,11 @@ class BaseDecomposer(abc.ABC):
                  
     """
     def __init__(self) -> None:
-        pass
+        self._dict_waves = dict()
 
-    @abc.abstractmethod
+    @abstractclassmethod
     def decompose_series(self, 
                         ds:DataFrame, 
-                        apply_cols:array[str]
+                        apply_cols:List[str]
                         ) -> object:
         pass

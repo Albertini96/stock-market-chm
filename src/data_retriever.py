@@ -13,7 +13,9 @@ class DataRetriever:
         pass
 
     def get_stock_ds(self) -> DataFrame:
-        return self.stock_ds.copy()
+        df = self.stock_ds.copy()
+        df = df[df.columns.drop(list(df.filter(regex='Volume')))]
+        return df
 
     def get_yahoo_stock_data(self) -> None:
         #Getting dictionary of stocks and associating with stock market

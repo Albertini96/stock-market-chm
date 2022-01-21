@@ -15,9 +15,7 @@ class CHMLevel():
 
 
     def __init__(self,
-                    context_regressor:BaseRegressor,
-                    X:DataFrame,
-                    y:DataFrame
+                    context_regressor:BaseRegressor
                 ) -> None:
         self._regressor = context_regressor
         

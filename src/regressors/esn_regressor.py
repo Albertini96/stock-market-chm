@@ -15,7 +15,13 @@ class ESNRegressor(BaseRegressor):
                  
     """
 
-    def __init__(self, ds, x_cols, y_cols, n_inputs, n_features, epochs) -> None:
+    def __init__(self, ds, 
+                       x_cols, 
+                       y_cols, 
+                       n_inputs, 
+                       n_features, 
+                       epochs
+                ) -> None:
         self._train_history = None
         self.n_inputs       = n_inputs
         self.n_features     = n_features

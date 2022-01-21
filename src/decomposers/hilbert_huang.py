@@ -13,7 +13,8 @@ class EMDDecomposition(BaseDecomposer):
                  
     """
     def __init__(self) -> None:
-        self.count_imf = dict()
+        self.dict_imf  = dict()
+        self.dict_freq = dict()
 
     def decompose_series(self, 
                         ds:DataFrame, 
@@ -21,15 +22,17 @@ class EMDDecomposition(BaseDecomposer):
                         add_freq:bool = False
                         ) -> object:
         
-        self.count_imf = dict()
-
         for col in apply_cols:
             imf = emd.sift.sift(ds[col])    
-            self.count_imf[col] = len(imf[0])
+            self.dict_imf[col]  = list()
+            self.dict_freq[col] = list()
 
             for f in range(len(imf[0])):
+                new_col = col + '_imf_' + str(f)
+                self.dict_imf[col].append(new_col)
+
                 #Adding IMF column to the dataset
-                ds[col + '_imf_' + str(f)] = imf[:, f]
+                ds[new_col] = imf[:, f]
 
                 #Add instantaneous frequencies if requested
                 if add_freq:
@@ -48,4 +51,6 @@ class EMDDecomposition(BaseDecomposer):
                     instantaneous_frequency = np.append(instantaneous_frequency, instantaneous_frequency[len(instantaneous_frequency)-1])
 
                     #Adding frequency column to the dataset
+                    new_col = col + '_imf_' + str(f) + '_freq'
+                    self.dict_freq[col] = new_col
                     ds[col + '_imf_' + str(f) + '_freq'] = instantaneous_frequency

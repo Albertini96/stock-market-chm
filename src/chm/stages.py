@@ -17,9 +17,7 @@ class CHMStage():
     """
 
     def __init__(self, level_list:List[CHMLevel],
-                       stage_regressor:BaseRegressor,
-                       X:DataFrame,
-                       y:DataFrame
+                       stage_regressor:BaseRegressor
                     ) -> None:
         self._level_list = level_list
         self._regressor  = stage_regressor
