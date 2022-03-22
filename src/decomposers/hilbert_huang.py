@@ -1,5 +1,6 @@
 from array import array
 import string
+from typing import List
 from decomposers.decomposer import BaseDecomposer
 import emd
 import numpy as np
@@ -13,31 +14,31 @@ class EMDDecomposition(BaseDecomposer):
                  
     """
     def __init__(self) -> None:
-        self.dict_imf  = dict()
+        self.dict_waves  = dict()
         self.dict_freq = dict()
 
     def decompose_series(self, 
                         ds:DataFrame, 
-                        apply_cols:array[str],
+                        apply_cols:List[str],
                         add_freq:bool = False
                         ) -> object:
         
         for col in apply_cols:
             imf = emd.sift.sift(ds[col])    
-            self.dict_imf[col]  = list()
+            self.dict_waves[col]  = list()
             self.dict_freq[col] = list()
 
-            for f in range(len(imf[0])):
+            for f, fr in zip(range(len(imf[0])), reversed(range(len(imf[0])))):
                 new_col = col + '_imf_' + str(f)
-                self.dict_imf[col].append(new_col)
+                self.dict_waves[col].append(new_col)
 
                 #Adding IMF column to the dataset
-                ds[new_col] = imf[:, f]
+                ds[new_col] = imf[:, fr]
 
                 #Add instantaneous frequencies if requested
                 if add_freq:
                     #Extracting analytical signal
-                    analytic_signal = hilbert(imf[:, f])
+                    analytic_signal = hilbert(imf[:, fr])
 
                     #Extracting amplitude evelope
                     #amplitude_envelope = np.abs(analytic_signal)
@@ -52,5 +53,5 @@ class EMDDecomposition(BaseDecomposer):
 
                     #Adding frequency column to the dataset
                     new_col = col + '_imf_' + str(f) + '_freq'
-                    self.dict_freq[col] = new_col
+                    self.dict_freq[col].append(new_col)
                     ds[col + '_imf_' + str(f) + '_freq'] = instantaneous_frequency

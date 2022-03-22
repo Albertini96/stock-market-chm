@@ -1,0 +1,18 @@
+
+original = nao utiliza valores do level passado
+temp2    = utiliza valores do level passado, utiliza os valores preditos de frequencia
+temp3    = utiliza valores do level passado, utiliza os proprios valores reais de frequencia
+temp4    = igual o temp3 mas nao usa o predict do level anterior a cada level
+temp5    = igual o temp3 mas utiliza a decomposição da serie inteira ao inves de usar somente do treino
+temp6    = igual o temp3 mas utiliza a decomposição da serie inteira ao inves de usar somente do treino, e faz a utilização dos valores do level passado de forma correta
+
+to_do _ no temp6 usar uma rede neural normal para juntar os valores no top down
+to_do _ aplicar o predict no dataset de test
+
+
+
+Metodologia : Treina cada nivel utilizando o predict do anterior, exceto no primeiro nivel, e Cria o contexto dos levels para o preditor top down. 
+              Treina os preditores das frequencias. 
+              Treina o preditor top down.
+
+              Para o predict, fazer o predict de cada um dos niveis, somar com a predição das frequencia, e utilizar como input no preditor topdown

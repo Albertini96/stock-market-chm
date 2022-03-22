@@ -17,7 +17,9 @@ class CHMStage():
     """
 
     def __init__(self, level_list:List[CHMLevel],
-                       stage_regressor:BaseRegressor
+                       stage_regressor:BaseRegressor,
+                       _max_level_context_len:int = None
                     ) -> None:
-        self._level_list = level_list
-        self._regressor  = stage_regressor
+        self._level_list            = level_list
+        self._regressor             = stage_regressor
+        self._max_level_context_len = _max_level_context_len

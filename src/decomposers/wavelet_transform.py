@@ -19,7 +19,8 @@ class WaveletDecomposition(BaseDecomposer):
 
     def decompose_series(self, 
                         ds:DataFrame,
-                        apply_cols:List[str]
+                        apply_cols:List[str],
+                        add_freq:bool = False
                         ) -> object:
         
         for col in apply_cols:
@@ -46,7 +47,10 @@ class WaveletDecomposition(BaseDecomposer):
                 
                 new_col = col + '_wave_' + str(i)
                 self.dict_waves[col].append(new_col)
-                ds[new_col] = rec[:len(rec)-1]
+                if len(ds) == len(rec):
+                    ds[new_col] = rec[:len(rec)]
+                else:    
+                    ds[new_col] = rec[:len(rec)-1]
 
 
     

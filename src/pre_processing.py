@@ -419,3 +419,21 @@ class PreProcessing():
         self.fill_stock_data_missings(test, True)
 
         return train, test
+
+    def pre_process_once(self):
+        new_ds = self.ds.copy(deep=True)
+
+        #Adding features
+        clse_cols = [x for x in new_ds.columns.difference(['Date']) if x[-5:] == 'Close']
+        self.add_bollinger_bands(new_ds, clse_cols, True, False)
+        self.add_sma(new_ds, clse_cols, True, 5, False)
+        self.add_rsi(new_ds, clse_cols, True, save_pictures=False)
+        self.add_stochastic_oscilator(new_ds, Config.get_tickers(), inplace=True, save_pictures=False)
+
+        #Scaling values
+        self._scalers = self.values_scaler(new_ds, new_ds.columns.difference(['Date']), self._base_scaler, True)
+
+        #Filling missings
+        self.fill_stock_data_missings(new_ds, True)
+
+        return new_ds

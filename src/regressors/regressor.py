@@ -27,5 +27,5 @@ class BaseRegressor(ABC):
         pass
 
     @abstractclassmethod
-    def predict_generator(self, X) -> Any:
+    def predict_generator(self, X, predict_last = False) -> Any:
         pass
