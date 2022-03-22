@@ -35,6 +35,12 @@ class Config():
     }
 
     model_variations =  {
+        'CHM-LSTM-EMD-Freq' :{
+            'CHM' : True,
+            'Regressor' : LSTMRegressor,
+            'Decomposer' : EMDDecomposition,
+            'use_freq' : True
+        },
         'CHM-LSTM-DWT' :{
             'CHM' : True,
             'Regressor' : LSTMRegressor,
@@ -63,12 +69,6 @@ class Config():
             'use_freq' : False
         },
 
-        'CHM-LSTM-EMD-Freq' :{
-            'CHM' : True,
-            'Regressor' : LSTMRegressor,
-            'Decomposer' : EMDDecomposition,
-            'use_freq' : True
-        },
 
         'CHM-ESN-EMD-Freq' :{
             'CHM' : True,

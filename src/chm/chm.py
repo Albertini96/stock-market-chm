@@ -121,7 +121,7 @@ class CascadeHierarquicalModel():
                 if self._use_frequency:
                     # For each frequency subwave of current wave
                     for col in temp_freq_dict.keys():
-                        temp_ds[wave + '_frequency'] = temp_ds[col][0]
+                        temp_ds[wave + '_frequency'] = temp_ds[temp_freq_dict[col][0]]
 
                 # Leaving only sintetized columns
                 # Dropping used subwave
@@ -326,7 +326,7 @@ class CascadeHierarquicalModel():
                 if self._use_frequency:
                     # For each frequency subwave of current wave
                     for col in temp_freq_dict.keys():
-                        temp_ds[wave + '_frequency'] = temp_ds[col][0]
+                        temp_ds[wave + '_frequency'] = temp_ds[temp_freq_dict[col][0]]
 
                 # Leaving only sintetized columns
                 # Dropping used subwave
