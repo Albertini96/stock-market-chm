@@ -3,10 +3,14 @@ from sklearn.model_selection import train_test_split
 from chm.chm import CascadeHierarquicalModel
 import config
 from data_retriever import DataRetriever
-from pre_processing import PreProcessing as pp
+from pre_processing import PreProcessing
 from regressors.esn_regressor import ESNRegressor
 from regressors.lstm_regressor import LSTMRegressor
 from regressors.ann_regressor import ANNRegressor
+
+import csv
+
+
 
 from scalers.min_max import MinMax
 
@@ -36,7 +40,7 @@ if __name__ == "__main__":
         dataset = a.get_stock_ds()
 
         #Preprocessing yahoo data
-        pp = pp(dataset, MinMax)
+        pp = PreProcessing(dataset, MinMax)
         ds = pp.pre_process_once()
 
         #Setting up column to be predicted
@@ -78,3 +82,7 @@ if __name__ == "__main__":
         prediction = prediction.ravel()
 
         predictions_dict[model_type] = prediction
+
+    with open('C:/Users/Usuario/Desktop/Mestrado/stock-market-chm/results/results.csv', 'w') as f:
+        for key in predictions_dict.keys():
+            f.write("%s,%s\n"%(key,predictions_dict[key]))
