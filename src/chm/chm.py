@@ -41,7 +41,7 @@ class CascadeHierarquicalModel():
                         num_stages:int=1                  ,
                         use_frequency:bool=False          ,
                         verbose=True,
-                        epochs= 150
+                        epochs= 300
                 ):
         self._ds                                   = ds
         # self._x_cols                             = x_cols

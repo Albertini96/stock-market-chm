@@ -19,19 +19,42 @@ class Config():
                 # Brasil Bolsa Balcao
                 'B3' : ['ITUB3.SA', 'ABEV3.SA', 'B3SA3.SA', ],
                 # New York Stock Exchange
-                'NYSE' : ['AAPL', 'MSFT', 'AMZN', ],
-                # Tokyo Stock Exchange
-                'TSE' : ['7011.T', ],
-                # Shangai Stock Exchange
-                # 'SSE' : ['ITUB4', 'ITUB4', 'ITUB4'],
-                # # Hong Kong Stock Exchange
-                # 'HKSE' : ['ITUB4', 'ITUB4', 'ITUB4'],
-                # # London Stock Exchange
-                # 'LSE' : ['ITUB4', 'ITUB4', 'ITUB4'],
-                # # National Stock Exchange of India Ltd
-                # 'NSEI' : ['ITUB4', 'ITUB4', 'ITUB4'],
-                # # Frankfurt Stock Exchange
-                # 'FSE' : ['ITUB4', 'ITUB4', 'ITUB4'],
+                'NYSE' : ['AAPL', 'MSFT', 'GOOG',],# 'AMZN', ],
+                # Tokyo Stock Exchange (Toyota, Keyence, Sony)
+                'TSE' : ['7203.T', '6861.T', '6758.T'], # ['7011.T',  Mitsubishi
+                # Shangai Stock Exchange (Kweichow Moutai Co., Ltd., China Construction Bank Corporation, Agricultural Bank of China)
+                'SSE' : ['600519.SS', '601939.SS', '601288.SS'],
+                # Hong Kong Stock Exchange (Tencent Holdings Limited, Industrial and Commercial Bank of China Limited, China Merchants Bank Co., Ltd.)
+                'HKSE' : ['0700.HK', '1398.HK', '3968.HK'],
+                # London Stock Exchange (Unilever, AstraZeneca, HSBC)
+                'LSE' : ['ULVR.L', 'AZN.L', 'HSBA.L'],
+                # National Stock Exchange of India Ltd (Reliance Industries Limited, Tata Consultancy Services, HDFC Bank Limited)
+                'NSEI' : ['RELIANCE.NS', 'TCS.NS', 'HDFCBANK.NS'],
+                # Frankfurt Stock Exchange (SAP, Siemens Aktiengesellschaft, Volkswagen)
+                'FSE' : ['SAP.DE', 'SIE.DE', 'VOW3.DE'],
+    }
+
+    k_fold_variations = {
+        '2010-2013T-2014V':{
+            'start_train_year':2010,
+            'end_train_year':2013,
+            'validation_year' : 2014
+        },
+        '2013-2016T-2017V':{
+            'start_train_year':2013,
+            'end_train_year':2016,
+            'validation_year' : 2017
+        },
+        '2016-2020T-2021V':{
+            'start_train_year':2016,
+            'end_train_year':2020,
+            'validation_year' : 2021
+        },
+        '33p_train_test':{
+            'start_train_year':None,
+            'end_train_year':None,
+            'validation_year' : None
+        }
     }
 
     model_variations =  {
@@ -91,14 +114,14 @@ class Config():
             'use_freq' : False
         },
 
-        'LSTM-EMD' :{
+        'ESN-EMD' :{
             'CHM' : False,
             'Regressor' : ESNRegressor,
             'Decomposer' : EMDDecomposition,
             'use_freq' : False
         },
 
-        'LSTM-DWT' :{
+        'ESN-DWT' :{
             'CHM' : False,
             'Regressor' : ESNRegressor,
             'Decomposer' : WaveletDecomposition,
